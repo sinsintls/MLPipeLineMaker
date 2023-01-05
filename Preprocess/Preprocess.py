@@ -3,47 +3,83 @@ from typing import List, Dict
 import numpy as np
 
 
-class SetError(Exception):
+class SetModeError(Exception):
     pass
 
 
-class PrepObj:
+class PrepPipe:
 
     def __init__(
             self,
             data_type: str,
             method_pipe_line: List[str],
             method_params: Dict[str, Dict] = None,
+            batch: bool = True,
+            parallel: bool = False,
                  ):
 
         self.data_type = data_type
         self.pipe_line = method_pipe_line
         self.params = method_params
-        self.parallel = False
-        self.batch = True
-
-    def set_mode(self, parallel: bool = False, batch: bool = True) -> None:
+        self.batch = batch
+        self.parallel = parallel
 
         if parallel and not batch:
-            raise SetError("Parallel mode is only for batch.")
+            raise SetModeError("Parallel mode is only for batch.\n")
 
-        self.parallel = parallel
-        self.batch = batch
-        print("Setting complete..")
+        self.pipeline = PipeObj(self)
 
     def exec_pipeline(self, data: np.ndarray) -> np.ndarray:
-        prep_data = data
+
+        prep_data = self.pipeline.put_in(data)
+
         return prep_data
 
-    def __call__(self, data: np.ndarray) -> np.ndarray:
-        prep_data: np.ndarray = self.exec_pipeline(data)
-        print("processing..", prep_data)
-        return prep_data
+    def __call__(self, data_: np.ndarray) -> np.ndarray:
+
+        print("Start processing!!\n")
+
+        try:
+
+            prep_data: np.ndarray = self.exec_pipeline(data_)
+
+            print("End processing!!\n")
+
+            return prep_data
+
+        except Exception as e:
+
+            print("Something wrong..\n", e)
+
+
+class PipeObj:
+
+    def __init__(
+            self,
+            pipeline: PrepPipe,
+    ):
+        self.pipeline = pipeline
+
+    def make_pipeline(self):
+        ### batch && stream // parallel or not ###
+        self.pipeline
+        pass
+
+    def put_in(self, data: np.ndarray) -> np.ndarray:
+
+        output = data
+
+        return output
+
+
+
+
+
 
 
 
 if __name__ == "__main__":
-    prep = PrepObj(
+    prep = PrepPipe(
         data_type="audio",
         method_pipe_line=["mfcc"]
     )
