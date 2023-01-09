@@ -1,31 +1,41 @@
 from typing import List, Dict
 
 import numpy as np
+import dask.delayed
+
+from Validators import valid_pipeline
 
 
+########### 에러메세지 스크립트 이동 #########
 class SetModeError(Exception):
     pass
 
+class PipeValidError(Exception):
+    pass
+
+#######################################
 
 class PrepPipe:
 
     def __init__(
             self,
             data_type: str,
-            method_pipe_line: List[str],
+            method_pipe_line_order: List[str],
             method_params: Dict[str, Dict] = None,
-            batch: bool = True,
             parallel: bool = False,
                  ):
 
-        self.data_type = data_type
-        self.pipe_line = method_pipe_line
-        self.params = method_params
-        self.batch = batch
-        self.parallel = parallel
+        ### validate pipe line
+        if valid_pipeline(method_pipe_line_order):
+            pass
+        else:
+            raise PipeValidError
 
-        if parallel and not batch:
-            raise SetModeError("Parallel mode is only for batch.\n")
+        ### get parameters
+        self.data_type = data_type
+        self.pipe_line_order = method_pipe_line_order
+        self.params = method_params
+        self.parallel = parallel
 
         self.pipeline = PipeObj(self)
 
@@ -58,27 +68,55 @@ class PipeObj:
             self,
             pipeline: PrepPipe,
     ):
-        self.pipeline = pipeline
-
-    def make_pipeline(self):
-        ### batch && stream // parallel or not ###
-        self.pipeline
-        pass
+        self.pipeline_info = pipeline
 
     def put_in(self, data: np.ndarray) -> np.ndarray:
 
-        output = data
+        if self.pipeline_info.parallel:
+            output = self.parallel_exec_pipe(data)
+
+        else:
+            output = self.exec_pipe(data)
 
         return output
 
+    def exec_pipe(self, data: np.ndarray) -> np.ndarray:
 
+        res = []
+        for d in data:
 
+            for method in self.pipeline_info.pipe_line_order:
 
+                func = eval(method)
+                params = self.pipeline_info.params[method]
+                d = func(d, params)
+
+            res.append(d)
+
+        return np.asarray(res)
+
+    def parallel_exec_pipe(self, data: np.ndarray) -> np.ndarray:
+
+        res = []
+        for d in data:
+
+            for method in self.pipeline_info.pipe_line_order:
+
+                func = eval(method)
+                params = self.pipeline_info.params[method]
+                d = dask.delayed(func)(d, params)
+
+            res.append(d)
+
+        res = dask.compute(*res)
+
+        return np.asarray(res)
 
 
 
 
 if __name__ == "__main__":
+
     prep = PrepPipe(
         data_type="audio",
         method_pipe_line=["mfcc"]
