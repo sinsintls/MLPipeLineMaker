@@ -6,7 +6,7 @@ import dask.diagnostics
 from tqdm import tqdm
 
 from Validators import valid_pipeline
-from Audio_tool import melspec, mfcc
+from Audio_tool import *
 
 
 ########### 에러메세지 스크립트 이동 #########
@@ -42,11 +42,6 @@ class PrepPipe:
 
         self.pipeline = PipeObj(self)
 
-    def exec_pipeline(self, data: np.ndarray) -> np.ndarray:
-
-        prep_data = self.pipeline.put_in(data)
-
-        return prep_data
 
     def __call__(self, data_: np.ndarray) -> np.ndarray:
 
@@ -54,7 +49,7 @@ class PrepPipe:
 
         try:
 
-            prep_data: np.ndarray = self.exec_pipeline(data_)
+            prep_data: np.ndarray = self.pipeline.put_in(data_)
 
             print("End processing!!\n")
 
@@ -74,6 +69,9 @@ class PipeObj:
         self.pipeline_info = pipeline
 
     def put_in(self, data: np.ndarray) -> np.ndarray:
+
+        if type(data[0]) != np.ndarray:
+            data = [data]
 
         if self.pipeline_info.parallel:
             output = self.parallel_exec_pipe(data)
@@ -122,7 +120,7 @@ if __name__ == "__main__":
     import librosa
 
     path = "test_audio.wav"
-    data = [librosa.load(path)[0]]
+    data = librosa.load(path)[0]
 
     """
         data_type: str,
@@ -133,12 +131,12 @@ if __name__ == "__main__":
 
     params = {
         "data_type": "audio",
-        "method_pipe_line_order": ["melspec","mfcc"],
+        "method_pipe_line_order": ["test1","test2"],
         "method_params": {
-            "melspec":{
+            "test1":{
 
             },
-            "mfcc":{
+            "test2":{
 
             }
         },
@@ -146,17 +144,7 @@ if __name__ == "__main__":
     }
 
     pp = PrepPipe(**params)
-        # data_type="audio",
-        # method_pipe_line_order=["melspec", "mfcc"],
-        # method_params={
-        #     "melspec": {
-        #
-        #     },
-        #     "mfcc": {
-        #
-        #     }
-        # },
-        # parallel=True
-        # )
 
-    print(pp(data).shape)
+    test_data = np.array([1,2,3,4,5])
+
+    print(pp(data))
