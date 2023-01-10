@@ -2,8 +2,11 @@ from typing import List, Dict
 
 import numpy as np
 import dask.delayed
+import dask.diagnostics
+from tqdm import tqdm
 
 from Validators import valid_pipeline
+from Audio_tool import melspec, mfcc
 
 
 ########### 에러메세지 스크립트 이동 #########
@@ -83,7 +86,7 @@ class PipeObj:
     def exec_pipe(self, data: np.ndarray) -> np.ndarray:
 
         res = []
-        for d in data:
+        for d in tqdm(data):
 
             for method in self.pipeline_info.pipe_line_order:
 
@@ -108,22 +111,52 @@ class PipeObj:
 
             res.append(d)
 
-        res = dask.compute(*res)
+        with dask.diagnostics.ProgressBar():
+            res = dask.compute(*res)
 
         return np.asarray(res)
 
 
 
-
 if __name__ == "__main__":
+    import librosa
 
-    prep = PrepPipe(
-        data_type="audio",
-        method_pipe_line=["mfcc"]
-    )
+    path = "test_audio.wav"
+    data = [librosa.load(path)[0]]
 
-    prep.set_mode(parallel=True, batch=True)
+    """
+        data_type: str,
+        method_pipe_line_order: List[str],
+        method_params: Dict[str, Dict] = None,
+        parallel: bool = False,
+    """
 
-    data = np.array([1, 2, 3, 4, 5])
+    params = {
+        "data_type": "audio",
+        "method_pipe_line_order": ["melspec","mfcc"],
+        "method_params": {
+            "melspec":{
 
-    prep(data)
+            },
+            "mfcc":{
+
+            }
+        },
+        "parallel": True
+    }
+
+    pp = PrepPipe(**params)
+        # data_type="audio",
+        # method_pipe_line_order=["melspec", "mfcc"],
+        # method_params={
+        #     "melspec": {
+        #
+        #     },
+        #     "mfcc": {
+        #
+        #     }
+        # },
+        # parallel=True
+        # )
+
+    print(pp(data).shape)
