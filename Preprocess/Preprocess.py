@@ -23,8 +23,7 @@ class PrepPipe:
     def __init__(
             self,
             data_type: str,
-            method_pipe_line_order: List[str],
-            method_params: Dict[str, Dict] = None,
+            method_pipe_line_order: List[Dict[str, Dict]],
             parallel: bool = False,
                  ):
 
@@ -37,7 +36,6 @@ class PrepPipe:
         ### get parameters
         self.data_type = data_type
         self.pipe_line_order = method_pipe_line_order
-        self.params = method_params
         self.parallel = parallel
 
         self.pipeline = PipeObj(self)
@@ -88,9 +86,11 @@ class PipeObj:
 
             for method in self.pipeline_info.pipe_line_order:
 
-                func = eval(method)
-                params = self.pipeline_info.params[method]
-                d = func(d, params)
+                method_name = list(method.keys())[0]
+                method_params = list(method.values())[0]
+
+                func = eval(method_name)
+                d = func(d, method_params)
 
             res.append(d)
 
@@ -103,9 +103,11 @@ class PipeObj:
 
             for method in self.pipeline_info.pipe_line_order:
 
-                func = eval(method)
-                params = self.pipeline_info.params[method]
-                d = dask.delayed(func)(d, params)
+                method_name = list(method.keys())[0]
+                method_params = list(method.values())[0]
+
+                func = eval(method_name)
+                d = dask.delayed(func)(d, method_params)
 
             res.append(d)
 
@@ -131,16 +133,19 @@ if __name__ == "__main__":
 
     params = {
         "data_type": "audio",
-        "method_pipe_line_order": ["test1","test2"],
-        "method_params": {
-            "test1":{
+        "method_pipe_line_order": [
+            {
+                "test1": {
 
+                }
             },
-            "test2":{
+            {
+                "test2": {
 
+                }
             }
-        },
-        "parallel": True
+        ],
+        "parallel": False
     }
 
     pp = PrepPipe(**params)
