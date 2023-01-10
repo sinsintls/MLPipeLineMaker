@@ -5,27 +5,27 @@ import numpy as np
 
 
 def resample(data: np.ndarray, params: Dict=None):
-    return librosa.resample(data, **params)
+    return librosa.resample(y=data, **params)
 
 
 def mfcc(data: np.ndarray, params: Dict=None):
-    return librosa.feature.mfcc(data, **params)
+    return librosa.feature.mfcc(y=data, **params)
 
 
 def melspectrogram(data: np.ndarray, params: Dict=None):
-    return librosa.feature.melspectrogram(data, **params)
+    return librosa.feature.melspectrogram(y=data, **params)
 
 
 def tonnetz(data: np.ndarray, params: Dict=None):
-    return librosa.feature.tonnetz(data, **params)
+    return librosa.feature.tonnetz(y=data, **params)
 
 
 def zero_crossing_rate(data: np.ndarray, params: Dict=None):
-    return librosa.feature.melspectrogram(data, **params)
+    return librosa.feature.melspectrogram(y=data, **params)
 
 
 def stft(data: np.ndarray, params: Dict=None):
-    return librosa.stft(data, **params)
+    return librosa.stft(y=data, **params)
 
 
 def test1(data: np.ndarray, params: Dict=None):

@@ -38,18 +38,14 @@ class PrepPipe:
         self.pipe_line_order = method_pipe_line_order
         self.parallel = parallel
 
-        self.pipeline = PipeObj(self)
+        self.pipeline = PipeObj(self.pipe_line_order, self.parallel)
 
 
     def __call__(self, data_: np.ndarray) -> np.ndarray:
 
-        print("Start processing!!\n")
-
         try:
 
             prep_data: np.ndarray = self.pipeline.put_in(data_)
-
-            print("End processing!!\n")
 
             return prep_data
 
@@ -62,16 +58,18 @@ class PipeObj:
 
     def __init__(
             self,
-            pipeline: PrepPipe,
+            pipeline_info: List[Dict[str, Dict]],
+            parallel: bool,
     ):
-        self.pipeline_info = pipeline
+        self.pipeline_info = pipeline_info
+        self.parallel = parallel
 
     def put_in(self, data: np.ndarray) -> np.ndarray:
 
         if type(data[0]) != np.ndarray:
             data = [data]
 
-        if self.pipeline_info.parallel:
+        if self.parallel:
             output = self.parallel_exec_pipe(data)
 
         else:
@@ -84,7 +82,7 @@ class PipeObj:
         res = []
         for d in tqdm(data):
 
-            for method in self.pipeline_info.pipe_line_order:
+            for method in self.pipeline_info:
 
                 method_name = list(method.keys())[0]
                 method_params = list(method.values())[0]
@@ -101,7 +99,7 @@ class PipeObj:
         res = []
         for d in data:
 
-            for method in self.pipeline_info.pipe_line_order:
+            for method in self.pipeline_info:
 
                 method_name = list(method.keys())[0]
                 method_params = list(method.values())[0]
@@ -135,21 +133,14 @@ if __name__ == "__main__":
         "data_type": "audio",
         "method_pipe_line_order": [
             {
-                "test1": {
+                "melspectrogram": {
 
                 }
             },
-            {
-                "test2": {
-
-                }
-            }
         ],
-        "parallel": False
+        "parallel": True
     }
 
     pp = PrepPipe(**params)
 
-    test_data = np.array([1,2,3,4,5])
-
-    print(pp(data))
+    print(pp(data),"\n",pp(data).shape)
