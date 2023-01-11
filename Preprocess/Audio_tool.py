@@ -20,7 +20,7 @@ def crop_n_pad(data: np.ndarray, params: Dict=None):
 
     if max_len < data_len:
 
-        pp_data = data[:len]
+        pp_data = data[:max_len]
 
     elif max_len > data_len:
 

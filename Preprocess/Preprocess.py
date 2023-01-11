@@ -117,6 +117,7 @@ class PipeObj:
 
 
 if __name__ == "__main__":
+
     import librosa
 
     path = "test_audio.wav"
@@ -132,6 +133,12 @@ if __name__ == "__main__":
     params = {
         "data_type": "audio",
         "method_pipe_line_order": [
+            {
+                "crop_n_pad": {
+                    "max_length": 10000,
+                    "padding_mode": "repeat",
+                }
+            },
             {
                 "melspectrogram": {
 
