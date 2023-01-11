@@ -121,13 +121,21 @@ if __name__ == "__main__":
     import librosa
 
     path = "test_audio.wav"
-    data = librosa.load(path)[0]
+    data, sr = librosa.load(path)
 
     """
-        data_type: str,
-        method_pipe_line_order: List[str],
-        method_params: Dict[str, Dict] = None,
-        parallel: bool = False,
+    preprocessing list
+
+    func
+    - crop_n_pad : max_length - int, padding_mode - str(zero or repeat)
+
+    librosa_func
+    - resample
+    - mfcc
+    - melspectrogram
+    - tonnetz
+    - zero_crossing_rate
+    - stft
     """
 
     params = {
@@ -152,3 +160,13 @@ if __name__ == "__main__":
     res = pp(data)
 
     print("shape: ", res.shape, "\n", "value: ", res)
+
+    """
+    use with loader parallel
+    
+    dataset_path = [ ... ]
+    
+    for 
+    
+    
+    """
