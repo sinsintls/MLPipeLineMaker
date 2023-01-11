@@ -50,6 +50,9 @@ def crop_n_pad(data: np.ndarray, params: Dict=None):
 
             pp_data = np.hstack(pp_data)
 
+    else:
+        pp_data = data
+
     return pp_data
 
 def resample(data: np.ndarray, params: Dict=None):
