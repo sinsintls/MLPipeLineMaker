@@ -162,11 +162,17 @@ if __name__ == "__main__":
     print("shape: ", res.shape, "\n", "value: ", res)
 
     """
-    use with loader parallel
+    How to use with loader parallel
     
     dataset_path = [ ... ]
     
-    for 
+    pp_dataset = []
+    for path in dataset_path:
+        data, sr = dask.delayed(loader)(path)
+        params = {..pipeline setting( preprocess order, function setting etc ..), parallel: False}
+        prep = PrepPipe(**params)
+        pp_dataset.append(dask.delayed(prep)(data))
     
-    
+    with dask.diagnostics.ProgressBar():
+        pp_dataset = dask.compute(*pp_dataset)
     """
