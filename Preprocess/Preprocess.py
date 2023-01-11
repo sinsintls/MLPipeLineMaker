@@ -149,5 +149,6 @@ if __name__ == "__main__":
     }
 
     pp = PrepPipe(**params)
+    res = pp(data)
 
-    print(pp(data),"\n",pp(data).shape)
+    print("shape: ", res.shape, "\n", "value: ", res)
