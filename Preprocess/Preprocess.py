@@ -45,7 +45,7 @@ class PrepPipe:
 
         try:
 
-            prep_data: np.ndarray = self.pipeline.put_in(data_)
+            prep_data: np.ndarray = self.pipeline(data_)
 
             return prep_data
 
@@ -55,7 +55,6 @@ class PrepPipe:
 
 
 class PipeObj:
-
     def __init__(
             self,
             pipeline_info: List[Dict[str, Dict]],
@@ -64,7 +63,7 @@ class PipeObj:
         self.pipeline_info = pipeline_info
         self.parallel = parallel
 
-    def put_in(self, data: np.ndarray) -> np.ndarray:
+    def __call__(self, data: np.ndarray) -> np.ndarray:
 
         if type(data[0]) != np.ndarray:
             data = [data]
@@ -138,6 +137,12 @@ if __name__ == "__main__":
     - stft
     """
 
+    """
+    TODO LIST
+    => parameter class 작성
+    => 
+    """
+
     params = {
         "data_type": "audio",
         "method_pipe_line_order": [
@@ -162,7 +167,7 @@ if __name__ == "__main__":
     print("shape: ", res.shape, "\n", "value: ", res)
 
     """
-    How to use with loader parallel
+    How to use with loader parallelly
     
     dataset_path = [ ... ]
     
