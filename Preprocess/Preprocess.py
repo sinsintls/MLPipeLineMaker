@@ -23,19 +23,19 @@ class PrepPipe:
     def __init__(
             self,
             data_type: str,
-            method_pipe_line_order: List[Dict[str, Dict]],
+            prep_pipe_line_order: List[Dict[str, Dict]],
             parallel: bool = False,
                  ):
 
         ### validate pipe line
-        if valid_pipeline(method_pipe_line_order):
+        if valid_pipeline(prep_pipe_line_order):
             pass
         else:
-            raise PipeValidError
+            raise PipeValidError("Inappropriate pipeline order. Check the data shapes.")
 
         ### get parameters
         self.data_type = data_type
-        self.pipe_line_order = method_pipe_line_order
+        self.pipe_line_order = prep_pipe_line_order
         self.parallel = parallel
 
         self.pipeline = PipeObj(self.pipe_line_order, self.parallel)
@@ -51,7 +51,7 @@ class PrepPipe:
 
         except Exception as e:
 
-            print("Something wrong..\n", e)
+            raise e
 
 
 class PipeObj:
@@ -145,7 +145,7 @@ if __name__ == "__main__":
 
     params = {
         "data_type": "audio",
-        "method_pipe_line_order": [
+        "prep_pipe_line_order": [
             {
                 "crop_n_pad": {
                     "max_length": 10000,
